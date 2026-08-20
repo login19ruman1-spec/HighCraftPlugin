@@ -46,7 +46,8 @@ public final class ConsequenceManager {
         double damageHp = Math.min(4.0, (baseDamageHearts + extraHearts) * 2.0);
         double minHp = plugin.getConfig().getDouble("settings.consequences.minimum-health-hearts", 1.0) * 2.0;
         p.setHealth(Math.max(minHp, p.getHealth() - damageHp));
-        d.health = p.getAttribute(Attribute.MAX_HEALTH).getValue();
+        // ИСПРАВЛЕНО: MAX_HEALTH → GENERIC_MAX_HEALTH
+        d.health = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
     }
 
     private void tick() {
@@ -66,13 +67,15 @@ public final class ConsequenceManager {
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 50, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 50, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 50, 2));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 50, 0));
+        // ИСПРАВЛЕНО: CONFUSION → NAUSEA
+        p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 50, 0));
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 50, 0));
     }
 
     public void clearWithdrawal(Player p) {
+        // ИСПРАВЛЕНО: CONFUSION → NAUSEA
         for (PotionEffectType t : new PotionEffectType[]{PotionEffectType.SLOWNESS, PotionEffectType.WEAKNESS,
-                PotionEffectType.HUNGER, PotionEffectType.CONFUSION, PotionEffectType.BLINDNESS})
+                PotionEffectType.HUNGER, PotionEffectType.NAUSEA, PotionEffectType.BLINDNESS})
             p.removePotionEffect(t);
     }
 
