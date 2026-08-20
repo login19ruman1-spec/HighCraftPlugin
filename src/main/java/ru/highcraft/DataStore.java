@@ -2,6 +2,7 @@ package ru.highcraft;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public final class DataStore {
             return;
         }
         yaml = YamlConfiguration.loadConfiguration(file);
+        
         if (yaml.getConfigurationSection("players") != null) {
             for (String key : yaml.getConfigurationSection("players").getKeys(false)) {
                 UUID uuid;
@@ -40,47 +42,48 @@ public final class DataStore {
                 players.put(uuid, d);
             }
         }
+        
         loadMap("ice", specialIce);
         loadMap("water", specialWater);
     }
 
     private void loadMap(String section, Map<String,String> map) {
         if (yaml.getConfigurationSection(section) == null) return;
-        for (String key : yaml.getConfigurationSection(section).getKeys(false)) {
-            // ИСПРАВЛЕНО: использование getString() вместо get()
-            String value = yaml.getString(section + "." + key);
-            if (value != null) {
-                map.put(key, value);
-            }
+        for (String k : yaml.getConfigurationSection(section).getKeys(false)) {
+            map.put(k, yaml.getString(section + "." + k));
         }
     }
 
-    public PlayerData player(UUID uuid) { 
-        return players.computeIfAbsent(uuid, k -> new PlayerData()); 
+    public PlayerData player(UUID uuid) {
+        return players.computeIfAbsent(uuid, k -> new PlayerData());
     }
 
-    public void markIce(Location l, String type) { 
-        specialIce.put(key(l), type); 
+    public void markIce(Location l, String type) {
+        specialIce.put(key(l), type);
+        save();
     }
     
-    public String ice(Location l) { 
-        return specialIce.get(key(l)); 
+    public String ice(Location l) {
+        return specialIce.get(key(l));
     }
     
-    public void removeIce(Location l) { 
-        specialIce.remove(key(l)); 
+    public void removeIce(Location l) {
+        specialIce.remove(key(l));
+        save();
     }
 
-    public void markWater(Location l, String type) { 
-        specialWater.put(key(l), type); 
+    public void markWater(Location l, String type) {
+        specialWater.put(key(l), type);
+        save();
     }
     
-    public String water(Location l) { 
-        return specialWater.get(key(l)); 
+    public String water(Location l) {
+        return specialWater.get(key(l));
     }
     
-    public void removeWater(Location l) { 
-        specialWater.remove(key(l)); 
+    public void removeWater(Location l) {
+        specialWater.remove(key(l));
+        save();
     }
 
     private String key(Location l) {
@@ -90,7 +93,7 @@ public final class DataStore {
     public void save() {
         if (yaml == null) yaml = new YamlConfiguration();
         yaml.set("players", null);
-        for (Map.Entry<UUID,PlayerData> e : players.entrySet()) {
+        for (Map.Entry<UUID, PlayerData> e : players.entrySet()) {
             String p = "players." + e.getKey();
             PlayerData d = e.getValue();
             yaml.set(p + ".count", d.count);
@@ -99,17 +102,11 @@ public final class DataStore {
             yaml.set(p + ".lastDegradation", d.lastDegradation);
         }
         yaml.set("ice", null);
-        for (Map.Entry<String, String> e : specialIce.entrySet()) {
-            yaml.set("ice." + e.getKey(), e.getValue());
-        }
+        for (var e : specialIce.entrySet()) yaml.set("ice." + e.getKey(), e.getValue());
         yaml.set("water", null);
-        for (Map.Entry<String, String> e : specialWater.entrySet()) {
-            yaml.set("water." + e.getKey(), e.getValue());
-        }
-        try { 
-            yaml.save(file); 
-        } catch (IOException ex) { 
-            plugin.getLogger().warning("Cannot save data.yml: " + ex.getMessage()); 
+        for (var e : specialWater.entrySet()) yaml.set("water." + e.getKey(), e.getValue());
+        try { yaml.save(file); } catch (IOException ex) {
+            plugin.getLogger().warning("Cannot save data.yml: " + ex.getMessage());
         }
     }
 
