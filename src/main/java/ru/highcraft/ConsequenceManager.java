@@ -22,7 +22,6 @@ public final class ConsequenceManager {
         long withdrawalMs = plugin.getConfig().getLong("settings.consequences.withdrawal-minutes", 40) * 60_000L;
         long degradationMs = plugin.getConfig().getLong("settings.consequences.degradation-minutes", 200) * 60_000L;
 
-        // Если прошло 40 минут — снимаем ломку и восстанавливаем здоровье
         if (now - d.lastUse >= withdrawalMs && d.count > 0) {
             d.count = 0;
             d.health = 20.0;
@@ -35,7 +34,6 @@ public final class ConsequenceManager {
             data.save();
         }
 
-        // Проверка деградации (каждые 200 минут)
         if (now - d.lastDegradation >= degradationMs) {
             d.count++;
             d.lastDegradation = now;
@@ -45,7 +43,6 @@ public final class ConsequenceManager {
         d.count++;
         d.lastUse = now;
 
-        // Расчёт урона
         double extraHearts = Math.min(
             plugin.getConfig().getDouble("settings.consequences.max-dose-damage-hearts", 2.0),
             Math.max(0, d.count / 10) * plugin.getConfig().getDouble("settings.consequences.degradation-step-hearts", 0.5)
@@ -53,7 +50,6 @@ public final class ConsequenceManager {
         double totalDamage = Math.min(4.0, (baseDamageHearts + extraHearts) * 2.0);
         double minHp = plugin.getConfig().getDouble("settings.consequences.minimum-health-hearts", 1.0) * 2.0;
 
-        // Применяем урон
         double newMaxHealth = Math.max(minHp, d.health - totalDamage);
         d.health = newMaxHealth;
         if (p.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
@@ -73,14 +69,12 @@ public final class ConsequenceManager {
             DataStore.PlayerData d = data.player(p.getUniqueId());
             long idle = now - d.lastUse;
             
-            // Если прошло 40 минут — ломка
             if (idle >= withdrawalMs && d.count > 0) {
                 applyWithdrawal(p);
                 d.count = 0;
                 data.save();
             }
             
-            // Если прошло 80 минут — сброс эффектов
             if (idle >= resetMs && d.count > 0) {
                 clearSubstanceEffects(p);
                 p.sendMessage(msg("effects_reset"));
@@ -92,17 +86,8 @@ public final class ConsequenceManager {
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, Integer.MAX_VALUE, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 2));
-        // Используем NAUSEA вместо CONFUSION (если есть) или просто пропускаем
-        try {
-            p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, Integer.MAX_VALUE, 0));
-        } catch (Exception e) {
-            // Если NAUSEA нет, пробуем CONFUSION
-            try {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 0));
-            } catch (Exception ex) {
-                // Если ничего нет — пропускаем
-            }
-        }
+        // Используем NAUSEA вместо CONFUSION
+        p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, Integer.MAX_VALUE, 0));
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
         p.sendMessage(msg("withdrawal_start"));
     }
@@ -111,14 +96,8 @@ public final class ConsequenceManager {
         p.removePotionEffect(PotionEffectType.SLOWNESS);
         p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.removePotionEffect(PotionEffectType.HUNGER);
+        p.removePotionEffect(PotionEffectType.NAUSEA);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
-        try {
-            p.removePotionEffect(PotionEffectType.NAUSEA);
-        } catch (Exception e) {
-            try {
-                p.removePotionEffect(PotionEffectType.CONFUSION);
-            } catch (Exception ex) {}
-        }
     }
 
     private void clearSubstanceEffects(Player p) {
@@ -138,13 +117,7 @@ public final class ConsequenceManager {
         p.removePotionEffect(PotionEffectType.RESISTANCE);
         p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.removePotionEffect(PotionEffectType.SLOW_FALLING);
-        try {
-            p.removePotionEffect(PotionEffectType.NAUSEA);
-        } catch (Exception e) {
-            try {
-                p.removePotionEffect(PotionEffectType.CONFUSION);
-            } catch (Exception ex) {}
-        }
+        p.removePotionEffect(PotionEffectType.NAUSEA);
     }
 
     public void resetPlayerHealth(Player p) {
