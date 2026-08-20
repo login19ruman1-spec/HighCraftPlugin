@@ -19,48 +19,16 @@ messages:
   prefix: "&8[&bHighCraft&8] "
   no-permission: "&cНет прав."
   reloaded: "&aКонфигурация перезагружена."
-  stats: "&7Счётчик: &f{count}&7, максимальное здоровье: &f{health} HP&7, ломка: &f{withdrawal}"
+  stats: "&7Счётчик: &f{count}&7, максимальное здоровье: &f{health} HP"
   used: "&aТы использовал &f{item}&a."
-  withdrawal: "&cЛомка снята."
+  withdrawal_start: "&4&lТЕБЯ НАКРЫВАЕТ ЛОМКА!"
+  withdrawal_cleared: "&aЛомка снята. Здоровье восстановлено."
+  effects_reset: "&eЭффекты прошли, но тело ослаблено."
+  respawn: "&cТы возродился, но тело разрушено алхимией..."
+  blindness_cured: "&aСлепота прошла после сна."
   cauldron-added: "&aИнгредиент принят котлом. &7Время: &f{seconds} сек."
   cauldron-ready: "&bКотёл готов. Забери жидкость ведром."
+  cauldron-no-water: "&cВ котле нет воды!"
   special-water: "&bЭликсир вылит. В земле появился один блок воды."
-  frozen: "&bВода замёрзла."
-  crystal-drop: "&dТы получил &f{amount} &dкристалл(ов)."
-
-recipes:
-  бодряк:
-    material: PAPER
-    damage-hearts: 0.5
-    effects:
-      - SPEED:60:0
-      - HUNGER:30:0
-    ingredients: [PAPER, SUGAR, SWEET_BERRIES]
-  сонник:
-    material: PAPER
-    damage-hearts: 0.5
-    effects:
-      - SLOWNESS:120:0
-      - RESISTANCE:60:0
-    ingredients: [PAPER, RED_MUSHROOM, MILK_BUCKET]
-  туман:
-    material: PAPER
-    damage-hearts: 0.5
-    effects:
-      - BLINDNESS:60:0
-      - INVISIBILITY:30:0
-    ingredients: [PAPER, COBWEB, BROWN_MUSHROOM]
-  яд:
-    material: PAPER
-    damage-hearts: 0.5
-    effects:
-      - POISON:60:0
-      - HUNGER:30:0
-    ingredients: [PAPER, POISONOUS_POTATO, BROWN_MUSHROOM]
-  распад:
-    material: PAPER
-    damage-hearts: 0.5
-    effects:
-      - WITHER:20:0
-      - SLOW_FALLING:60:0
-    ingredients: [PAPER, ROTTEN_FLESH, SUGAR]
+  frozen: "&bВода замёрзла!"
+  crystal_drop: "&dТы получил &f{amount} &dкристалл(ов)."
