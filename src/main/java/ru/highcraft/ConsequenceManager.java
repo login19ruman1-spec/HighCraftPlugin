@@ -92,7 +92,17 @@ public final class ConsequenceManager {
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, Integer.MAX_VALUE, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 2));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 0));
+        // Используем NAUSEA вместо CONFUSION (если есть) или просто пропускаем
+        try {
+            p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, Integer.MAX_VALUE, 0));
+        } catch (Exception e) {
+            // Если NAUSEA нет, пробуем CONFUSION
+            try {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 0));
+            } catch (Exception ex) {
+                // Если ничего нет — пропускаем
+            }
+        }
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
         p.sendMessage(msg("withdrawal_start"));
     }
@@ -101,8 +111,14 @@ public final class ConsequenceManager {
         p.removePotionEffect(PotionEffectType.SLOWNESS);
         p.removePotionEffect(PotionEffectType.WEAKNESS);
         p.removePotionEffect(PotionEffectType.HUNGER);
-        p.removePotionEffect(PotionEffectType.CONFUSION);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
+        try {
+            p.removePotionEffect(PotionEffectType.NAUSEA);
+        } catch (Exception e) {
+            try {
+                p.removePotionEffect(PotionEffectType.CONFUSION);
+            } catch (Exception ex) {}
+        }
     }
 
     private void clearSubstanceEffects(Player p) {
@@ -121,8 +137,14 @@ public final class ConsequenceManager {
         p.removePotionEffect(PotionEffectType.JUMP_BOOST);
         p.removePotionEffect(PotionEffectType.RESISTANCE);
         p.removePotionEffect(PotionEffectType.WEAKNESS);
-        p.removePotionEffect(PotionEffectType.CONFUSION);
         p.removePotionEffect(PotionEffectType.SLOW_FALLING);
+        try {
+            p.removePotionEffect(PotionEffectType.NAUSEA);
+        } catch (Exception e) {
+            try {
+                p.removePotionEffect(PotionEffectType.CONFUSION);
+            } catch (Exception ex) {}
+        }
     }
 
     public void resetPlayerHealth(Player p) {
