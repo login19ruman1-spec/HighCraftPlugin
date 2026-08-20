@@ -45,8 +45,13 @@ public final class DataStore {
 
     private void loadMap(String section, Map<String,String> map) {
         if (yaml.getConfigurationSection(section) == null) return;
-        for (String k : yaml.getConfigurationSection(section).getKeys(false))
-            map.put(k, yaml.getString(section + "." + k));
+        for (String k : yaml.getConfigurationSection(section).getKeys(false)) {
+            // ИСПРАВЛЕНО: явное приведение к String
+            Object value = yaml.get(section + "." + k);
+            if (value instanceof String) {
+                map.put(k, (String) value);
+            }
+        }
     }
 
     public PlayerData player(UUID uuid) { return players.computeIfAbsent(uuid, k -> new PlayerData()); }
