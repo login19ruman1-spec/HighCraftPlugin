@@ -1,0 +1,17 @@
+name: HighCraftPlugin
+version: 1.0.0
+main: ru.highcraft.HighCraftPlugin
+api-version: '1.20'
+author: HighCraft
+description: Custom substances, cauldron crystals and consequence system.
+commands:
+  drug:
+    description: HighCraftPlugin administration and stats
+    usage: /drug <stats|give|reload>
+    aliases: [highcraft]
+    permission: highcraft.drug
+permissions:
+  highcraft.drug:
+    default: true
+  highcraft.admin:
+    default: op
