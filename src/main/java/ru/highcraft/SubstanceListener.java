@@ -46,7 +46,6 @@ public final class SubstanceListener implements Listener {
             Player p = e.getPlayer();
             String name = item.getItemMeta().getDisplayName();
             
-            // Проверка: если игрок в ломке — снимаем ломку и не даём эффектов
             DataStore.PlayerData d = data.player(p.getUniqueId());
             long now = System.currentTimeMillis();
             long withdrawalMs = plugin.getConfig().getLong("settings.consequences.withdrawal-minutes", 40) * 60_000L;
@@ -65,7 +64,6 @@ public final class SubstanceListener implements Listener {
                 return;
             }
             
-            // Обычное употребление
             consumeOne(item, p);
             p.sendMessage(msg("used").replace("{item}", name));
         }
@@ -121,18 +119,6 @@ public final class SubstanceListener implements Listener {
         }
     }
 
-    private PotionEffectType getNauseaType() {
-        try {
-            return PotionEffectType.NAUSEA;
-        } catch (Exception e) {
-            try {
-                return PotionEffectType.CONFUSION;
-            } catch (Exception ex) {
-                return null;
-            }
-        }
-    }
-
     private void applySubstance(String id, Player p) {
         switch(id) {
             case "бодряк" -> {
@@ -164,7 +150,7 @@ public final class SubstanceListener implements Listener {
                 effect(p, PotionEffectType.RESISTANCE, 30, 0);
             }
             case "зеркало" -> {
-                effect(p, getNauseaType(), 60, 0);
+                effect(p, PotionEffectType.NAUSEA, 60, 0);
                 effect(p, PotionEffectType.DOLPHINS_GRACE, 30, 0);
             }
             case "ускоритель" -> {
@@ -188,7 +174,7 @@ public final class SubstanceListener implements Listener {
                 effect(p, PotionEffectType.WEAKNESS, 60, 0);
             }
             case "цветной_дым" -> {
-                effect(p, getNauseaType(), 120, 0);
+                effect(p, PotionEffectType.NAUSEA, 120, 0);
                 effect(p, PotionEffectType.JUMP_BOOST, 60, 0);
             }
             case "кислота" -> {
@@ -292,9 +278,7 @@ public final class SubstanceListener implements Listener {
     @EventHandler
     public void onBed(PlayerBedEnterEvent e) {
         Player p = e.getPlayer();
-        // Снимаем слепоту от веществ (но не от ломки)
         if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-            // Проверяем, не ломка ли это (ломка имеет бесконечную длительность)
             for (PotionEffect effect : p.getActivePotionEffects()) {
                 if (effect.getType() == PotionEffectType.BLINDNESS && effect.getDuration() < Integer.MAX_VALUE - 10) {
                     p.removePotionEffect(PotionEffectType.BLINDNESS);
