@@ -121,6 +121,18 @@ public final class SubstanceListener implements Listener {
         }
     }
 
+    private PotionEffectType getNauseaType() {
+        try {
+            return PotionEffectType.NAUSEA;
+        } catch (Exception e) {
+            try {
+                return PotionEffectType.CONFUSION;
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
     private void applySubstance(String id, Player p) {
         switch(id) {
             case "бодряк" -> {
@@ -152,7 +164,7 @@ public final class SubstanceListener implements Listener {
                 effect(p, PotionEffectType.RESISTANCE, 30, 0);
             }
             case "зеркало" -> {
-                effect(p, PotionEffectType.NAUSEA, 60, 0);
+                effect(p, getNauseaType(), 60, 0);
                 effect(p, PotionEffectType.DOLPHINS_GRACE, 30, 0);
             }
             case "ускоритель" -> {
@@ -176,7 +188,7 @@ public final class SubstanceListener implements Listener {
                 effect(p, PotionEffectType.WEAKNESS, 60, 0);
             }
             case "цветной_дым" -> {
-                effect(p, PotionEffectType.CONFUSION, 120, 0);
+                effect(p, getNauseaType(), 120, 0);
                 effect(p, PotionEffectType.JUMP_BOOST, 60, 0);
             }
             case "кислота" -> {
