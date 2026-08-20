@@ -5,48 +5,107 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 import java.util.*;
 
 public final class RecipeManager {
     private final HighCraftPlugin plugin;
     private final ItemFactory items;
-    private final List<NamespacedKey> keys = new ArrayList<>();
 
     public RecipeManager(HighCraftPlugin plugin, ItemFactory items) {
-        this.plugin = plugin; this.items = items;
+        this.plugin = plugin;
+        this.items = items;
     }
 
     public void register() {
-        for (NamespacedKey key : keys) Bukkit.removeRecipe(key);
-        keys.clear();
+        // Удаляем старые рецепты
+        for (NamespacedKey key : new ArrayList<>(Bukkit.getServer().getRecipeKeys())) {
+            if (key.getNamespace().equals(plugin.getName().toLowerCase())) {
+                Bukkit.removeRecipe(key);
+            }
+        }
 
-        registerSimple("бодряк","B","&dБодряк", Material.PAPER, Material.SUGAR, Material.SWEET_BERRIES);
-        registerSimple("сонник","S","&dСонник", Material.PAPER, Material.RED_MUSHROOM, Material.MILK_BUCKET);
-        registerSimple("туман","T","&dТуман", Material.PAPER, Material.COBWEB, Material.BROWN_MUSHROOM);
-        registerSimple("яд","Y","&dЯд", Material.PAPER, Material.POISONOUS_POTATO, Material.BROWN_MUSHROOM);
-        registerSimple("распад","R","&dРаспад", Material.PAPER, Material.ROTTEN_FLESH, Material.SUGAR);
+        // РЕЦЕПТЫ УРОВНЯ 1 (Верстак) — 5 штук
+        registerShaped("bodyak", "bod", "&5Бодряк",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.SUGAR, 'C', Material.SWEET_BERRIES));
 
-        registerSimple("фокус","F","&dФокус", Material.PAPER, Material.GLOWSTONE_DUST, Material.SPIDER_EYE);
-        registerSimple("тяжесть","G","&dТяжесть", Material.PAPER, Material.NETHER_WART, Material.GLOWSTONE_DUST);
-        registerSimple("зеркало","Z","&dЗеркало", Material.PAPER, Material.COBWEB, Material.GLOWSTONE_DUST);
-        registerSimple("ускоритель","U","&dУскоритель", Material.PAPER, Material.BONE_MEAL, Material.SUGAR);
+        registerShaped("sonnik", "son", "&5Сонник",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.RED_MUSHROOM, 'C', Material.MILK_BUCKET));
 
-        registerSimple("эликсир","E","&dЭликсир", Material.PAPER, Material.GOLDEN_CARROT, Material.POTION);
-        registerSimple("радуга","A","&dРадуга", Material.PAPER, Material.GLOWSTONE_DUST, Material.POTION);
-        registerSimple("хаос","C","&dХаос", Material.PAPER, Material.SWEET_BERRIES, Material.POTION);
+        registerShaped("tuman", "tum", "&5Туман",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.COBWEB, 'C', Material.BROWN_MUSHROOM));
+
+        registerShaped("yad", "yad", "&5Яд",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.POISONOUS_POTATO, 'C', Material.BROWN_MUSHROOM));
+
+        registerShaped("raspad", "ras", "&5Распад",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.ROTTEN_FLESH, 'C', Material.SUGAR));
+
+        // РЕЦЕПТЫ УРОВНЯ 2 (4 штуки)
+        registerShaped("fokus", "fok", "&5Фокус",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.GLOWSTONE_DUST, 'C', Material.SPIDER_EYE));
+
+        registerShaped("tyazhest", "tya", "&5Тяжесть",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.NETHER_WART, 'C', Material.GLOWSTONE_DUST));
+
+        registerShaped("zerkalo", "zer", "&5Зеркало",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.COBWEB, 'C', Material.GLOWSTONE_DUST));
+
+        registerShaped("uskoritel", "usk", "&5Ускоритель",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.BONE_MEAL, 'C', Material.SUGAR));
+
+        // РЕЦЕПТЫ УРОВНЯ 3 (3 штуки)
+        registerShaped("eliksir", "eli", "&5Эликсир",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.GOLDEN_CARROT, 'C', Material.POTION));
+
+        registerShaped("raduga", "rad", "&5Радуга",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.GLOWSTONE_DUST, 'C', Material.POTION));
+
+        registerShaped("khaos", "kha", "&5Хаос",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.SWEET_BERRIES, 'C', Material.POTION));
+
+        // ДОП. КОМБИНАЦИИ (3 штуки)
+        registerShaped("ten", "ten", "&5Тень",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.NETHER_BRICK, 'C', Material.RED_MUSHROOM));
+
+        registerShaped("cvetnoy_dym", "cvd", "&5Цветной дым",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.GLOWSTONE_DUST, 'C', Material.SPIDER_EYE));
+
+        registerShaped("kislota", "kis", "&5Кислота",
+            new String[]{" A ", " B ", " C "},
+            Map.of('A', Material.PAPER, 'B', Material.CACTUS, 'C', Material.POTION));
+
+        plugin.getLogger().info("§aЗарегистрировано 15 рецептов!");
     }
 
-    private void registerSimple(String id, String keyChar, String name, Material a, Material b, Material c) {
-        ItemStack result = items.substance(id, ChatColorName(name), Material.PAPER);
+    private void registerShaped(String id, String keyChar, String name, String[] shape, Map<Character, Material> ingredients) {
+        ItemStack result = items.substance(id, name, Material.PAPER);
         NamespacedKey key = new NamespacedKey(plugin, "craft_" + id);
-        ShapedRecipe r = new ShapedRecipe(key, result);
-        r.shape("ABC"," B ","   ");
-        r.setIngredient('A', a); r.setIngredient('B', b); r.setIngredient('C', c);
-        Bukkit.addRecipe(r); keys.add(key);
-    }
-
-    private String ChatColorName(String s) {
-        return s.replace("&d","");
+        ShapedRecipe recipe = new ShapedRecipe(key, result);
+        recipe.shape(shape[0], shape[1], shape[2]);
+        for (var entry : ingredients.entrySet()) {
+            recipe.setIngredient(entry.getKey(), entry.getValue());
+        }
+        try {
+            Bukkit.addRecipe(recipe);
+            plugin.getLogger().info("Рецепт зарегистрирован: " + id);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Не удалось зарегистрировать рецепт " + id + ": " + e.getMessage());
+        }
     }
 }
