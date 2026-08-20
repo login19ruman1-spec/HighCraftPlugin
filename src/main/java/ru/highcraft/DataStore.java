@@ -27,17 +27,18 @@ public final class DataStore {
             return;
         }
         yaml = YamlConfiguration.loadConfiguration(file);
-        for (String key : yaml.getConfigurationSection("players") == null ? Collections.emptySet()
-                : yaml.getConfigurationSection("players").getKeys(false)) {
-            UUID uuid;
-            try { uuid = UUID.fromString(key); } catch (Exception ignored) { continue; }
-            String path = "players." + key;
-            PlayerData d = new PlayerData();
-            d.count = yaml.getInt(path + ".count", 0);
-            d.health = yaml.getDouble(path + ".health", 20.0);
-            d.lastUse = yaml.getLong(path + ".lastUse", System.currentTimeMillis());
-            d.lastDegradation = yaml.getLong(path + ".lastDegradation", d.lastUse);
-            players.put(uuid, d);
+        if (yaml.getConfigurationSection("players") != null) {
+            for (String key : yaml.getConfigurationSection("players").getKeys(false)) {
+                UUID uuid;
+                try { uuid = UUID.fromString(key); } catch (Exception ignored) { continue; }
+                String path = "players." + key;
+                PlayerData d = new PlayerData();
+                d.count = yaml.getInt(path + ".count", 0);
+                d.health = yaml.getDouble(path + ".health", 20.0);
+                d.lastUse = yaml.getLong(path + ".lastUse", System.currentTimeMillis());
+                d.lastDegradation = yaml.getLong(path + ".lastDegradation", d.lastUse);
+                players.put(uuid, d);
+            }
         }
         loadMap("ice", specialIce);
         loadMap("water", specialWater);
@@ -45,24 +46,42 @@ public final class DataStore {
 
     private void loadMap(String section, Map<String,String> map) {
         if (yaml.getConfigurationSection(section) == null) return;
-        for (String k : yaml.getConfigurationSection(section).getKeys(false)) {
-            // ИСПРАВЛЕНО: явное приведение к String
-            Object value = yaml.get(section + "." + k);
-            if (value instanceof String) {
-                map.put(k, (String) value);
+        for (String key : yaml.getConfigurationSection(section).getKeys(false)) {
+            // ИСПРАВЛЕНО: использование getString() вместо get()
+            String value = yaml.getString(section + "." + key);
+            if (value != null) {
+                map.put(key, value);
             }
         }
     }
 
-    public PlayerData player(UUID uuid) { return players.computeIfAbsent(uuid, k -> new PlayerData()); }
+    public PlayerData player(UUID uuid) { 
+        return players.computeIfAbsent(uuid, k -> new PlayerData()); 
+    }
 
-    public void markIce(Location l, String type) { specialIce.put(key(l), type); }
-    public String ice(Location l) { return specialIce.get(key(l)); }
-    public void removeIce(Location l) { specialIce.remove(key(l)); }
+    public void markIce(Location l, String type) { 
+        specialIce.put(key(l), type); 
+    }
+    
+    public String ice(Location l) { 
+        return specialIce.get(key(l)); 
+    }
+    
+    public void removeIce(Location l) { 
+        specialIce.remove(key(l)); 
+    }
 
-    public void markWater(Location l, String type) { specialWater.put(key(l), type); }
-    public String water(Location l) { return specialWater.get(key(l)); }
-    public void removeWater(Location l) { specialWater.remove(key(l)); }
+    public void markWater(Location l, String type) { 
+        specialWater.put(key(l), type); 
+    }
+    
+    public String water(Location l) { 
+        return specialWater.get(key(l)); 
+    }
+    
+    public void removeWater(Location l) { 
+        specialWater.remove(key(l)); 
+    }
 
     private String key(Location l) {
         return l.getWorld().getUID() + ":" + l.getBlockX() + ":" + l.getBlockY() + ":" + l.getBlockZ();
@@ -80,10 +99,18 @@ public final class DataStore {
             yaml.set(p + ".lastDegradation", d.lastDegradation);
         }
         yaml.set("ice", null);
-        for (var e : specialIce.entrySet()) yaml.set("ice." + e.getKey(), e.getValue());
+        for (Map.Entry<String, String> e : specialIce.entrySet()) {
+            yaml.set("ice." + e.getKey(), e.getValue());
+        }
         yaml.set("water", null);
-        for (var e : specialWater.entrySet()) yaml.set("water." + e.getKey(), e.getValue());
-        try { yaml.save(file); } catch (IOException ex) { plugin.getLogger().warning("Cannot save data.yml: " + ex.getMessage()); }
+        for (Map.Entry<String, String> e : specialWater.entrySet()) {
+            yaml.set("water." + e.getKey(), e.getValue());
+        }
+        try { 
+            yaml.save(file); 
+        } catch (IOException ex) { 
+            plugin.getLogger().warning("Cannot save data.yml: " + ex.getMessage()); 
+        }
     }
 
     public static final class PlayerData {
