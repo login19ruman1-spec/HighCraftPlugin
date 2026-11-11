@@ -96,7 +96,10 @@ public final class RecipeManager {
 
     private void registerShaped(String id, String name, String[] shape, Map<Character, Material> ingredients) {
         ItemStack result = items.substance(id, name, Material.PAPER);
-        NamespacedKey key = new NamespacedKey(plugin, "craft_" + id);
+        // Recipe keys are technical identifiers: Bukkit only accepts lowercase ASCII
+        // [a-z0-9/._-]. Keep Russian display names in ItemMeta, never in the key.
+        String safeId = id.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9/._-]", "_");
+        NamespacedKey key = new NamespacedKey(plugin, "craft_" + safeId);
         ShapedRecipe recipe = new ShapedRecipe(key, result);
         recipe.shape(shape[0], shape[1], shape[2]);
         for (var entry : ingredients.entrySet()) {
